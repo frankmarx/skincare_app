@@ -6,7 +6,7 @@
     "api_gateway_stage": "api",
     "environment_variables": {
         "DATABASE_URL": "postgresql://neondb_owner:npg_OW6VUxHTGy1b@ep-round-hill-anlrfy72.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require",
-        "ANTHROPIC_API_KEY": "",
+        "ANTHROPIC_API_KEY": "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",
         "COGNITO_USER_POOL_ID": "us-east-1_Kmzu4x9qL",
         "COGNITO_CLIENT_ID": "2joqnf26r7il1he11ttj8bnrel"
     },

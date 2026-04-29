@@ -8,6 +8,7 @@ frontend/.env.local
 backend/__pycache__/
 backend/*.pyc
 backend/skincare-env/
+backend/.env
 backend/.chalice/deployments/
 
 # General
