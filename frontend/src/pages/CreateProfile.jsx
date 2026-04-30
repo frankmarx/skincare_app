@@ -8,6 +8,7 @@ import styles from "../components/Common.module.css";
 export default function CreateProfile() {
   const { profiles } = useProfile();
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function CreateProfile() {
     setLoading(true);
     setError("");
     try {
-      const profile = await createProfile(n);
+      const profile = await createProfile(n, description);
       navigate(`/builder/${profile.id}`);
     } catch (e) {
       setError(e.message || "Failed to create profile");
@@ -42,6 +43,12 @@ export default function CreateProfile() {
           placeholder="e.g. Sarah"
           autoFocus
           className={error ? styles.formInputError : ""}
+        />
+        <FormLabel>Description (Optional)</FormLabel>
+        <Input
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder="e.g. Main, Travel, Wishlist"
         />
         {error && <div className={styles.formInputErrorMsg}>{error}</div>}
         <PrimaryButton onClick={handleCreate} disabled={loading}>

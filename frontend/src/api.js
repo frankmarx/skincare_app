@@ -91,11 +91,11 @@ export async function getProfiles() {
   return handleResponse(response);
 }
 
-export async function createProfile(name) {
+export async function createProfile(name, description) {
   const response = await fetch(`${API_URL}/profiles`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, description }),
   });
   return handleResponse(response);
 }

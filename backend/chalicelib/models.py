@@ -9,6 +9,7 @@ class Profile(Base):
     id = Column(String, primary_key=True)
     user_id = Column(String, nullable=False, index=True)
     name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

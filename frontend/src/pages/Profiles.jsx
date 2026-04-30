@@ -11,6 +11,7 @@ function ProfileCard({ profile, onOpen }) {
     <div onClick={() => onOpen(profile)} className={profilesStyles.card}>
       <div className={profilesStyles.avatar}>{profile.name[0]}</div>
       <div className={profilesStyles.name}>{profile.name}</div>
+      {profile.description && <div className={profilesStyles.description}>{profile.description}</div>}
       <div className={profilesStyles.stats}>
         <div className={profilesStyles.statItem}>
           <span>Rituals</span>

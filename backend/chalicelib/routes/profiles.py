@@ -33,6 +33,7 @@ def list_profiles():
                 results.append({
                     'id': p.id,
                     'name': p.name,
+                    'description': p.description,
                     'createdAt': p.created_at.isoformat(),
                     'updatedAt': p.updated_at.isoformat() if p.updated_at else None,
                     'ritualsCount': ritual_count,
@@ -59,6 +60,7 @@ def create_profile():
                 id=f'profile-{uuid.uuid4().hex[:12]}',
                 user_id=user_id,
                 name=body.get('name'),
+                description=body.get('description'),
             )
             db.add(profile)
             db.commit()
