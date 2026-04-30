@@ -1,7 +1,25 @@
 from chalice import Blueprint, Response
-from chalicelib.auth import sign_up, confirm_sign_up, sign_in
+from chalicelib.auth import sign_up, confirm_sign_up, sign_in, get_user_info
+from chalice import UnauthorizedError
 
 auth = Blueprint(__name__)
+
+@auth.route('/auth/me', methods=['GET'])
+def me():
+    try:
+        # The ID token is usually passed as the Bearer token for user info
+        token = auth.current_request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return Response(body={'error': 'Missing token'}, status_code=401)
+        
+        user_info = get_user_info(token)
+        return Response(body={
+            'email': user_info.get('email'),
+            'sub': user_info.get('sub'),
+            'name': user_info.get('name')
+        }, status_code=200)
+    except Exception as e:
+        return Response(body={'error': str(e)}, status_code=401)
 
 @auth.route('/auth/signup', methods=['POST'])
 def signup():

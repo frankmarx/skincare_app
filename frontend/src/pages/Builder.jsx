@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { analyzeRoutine, saveRitual, getProfiles } from "../api.js";
 import { c, PageHeader, BackButton, ProductAutocomplete, RitualView } from "../components/Common.jsx";
+import layoutStyles from "./Layout.module.css";
 import { useProfile } from "../context/ProfileContext.jsx";
 
 export default function Builder() {
@@ -59,8 +60,8 @@ export default function Builder() {
   if (profileLoading || !selectedProfile) return null;
 
   return (
-    <div style={{ maxWidth:720, margin:"0 auto" }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
+    <div className={layoutStyles.container}>
+      <div className={layoutStyles.header}>
         <BackButton onBack={() => navigate("/rituals")} label="Back to rituals" />
       </div>
       <PageHeader eyebrow={selectedProfile.name} title={<>Build Your <em>Ritual</em></>} />

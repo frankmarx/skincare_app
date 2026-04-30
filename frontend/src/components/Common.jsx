@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import { getProductSuggestions, signOut } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import styles from "./Common.module.css";
@@ -14,18 +14,71 @@ export const c = {
   danger:"#FCEBEB", dangerBorder:"#F09595", dangerText:"#A32D2D",
 };
 
-export function SignOutButton() {
+export function FormCard({ children }) {
+  return <div className={styles.formCard}>{children}</div>;
+}
+
+export function FormLabel({ children }) {
+  return <label className={styles.formLabel}>{children}</label>;
+}
+
+export function Input({ className, ...props }) {
+  return <input className={styles.formInput + (className ? " " + className : "")} {...props} />;
+}
+
+export function PrimaryButton({ children, ...props }) {
+  return <button className={styles.primaryButton} {...props}>{children}</button>;
+}
+
+export function BottomNav() {
+  return (
+    <nav className={styles.bottomNav}>
+      <NavLink to="/profiles" className={({ isActive }) => styles.navItem + (isActive ? " " + styles.navItemActive : "")}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </NavLink>
+      <NavLink to="/rituals" className={({ isActive }) => styles.navItem + (isActive ? " " + styles.navItemActive : "")}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </NavLink>
+      <NavLink to="/build" className={({ isActive }) => styles.navItem + (isActive ? " " + styles.navItemActive : "")}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      </NavLink>
+      <NavLink to="/build" className={({ isActive }) => styles.navItem + (isActive ? " " + styles.navItemActive : "")}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 0a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+      </NavLink>
+    </nav>
+  );
+}
+
+export function AccountMenu() {
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
+
   const handleSignOut = async () => {
+    setOpen(false);
     await logout();
     navigate("/signin");
   };
 
   return (
-    <button onClick={handleSignOut} className={styles.signOutBtn}>
-      Sign Out
-    </button>
+    <div className={styles.accountMenuContainer}>
+      <div className={styles.accountIcon} onClick={() => setOpen(!open)}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      {open && (
+        <div className={styles.accountDropdown}>
+          <div className={styles.accountMenuItem} onClick={() => { setOpen(false); navigate("/account"); }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            My Account
+          </div>
+          <div className={styles.accountMenuItemDivider} />
+          <div className={styles.accountMenuItem} onClick={handleSignOut}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

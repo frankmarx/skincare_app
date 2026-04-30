@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createProfile } from "../api.js";
-import { c, PageHeader, BackButton } from "../components/Common.jsx";
+import { PageHeader, BackButton, FormCard, FormLabel, Input, PrimaryButton } from "../components/Common.jsx";
+import { useProfile } from "../context/ProfileContext.jsx";
+import styles from "../components/Common.module.css";
 
-export default function CreateProfile({ hasProfiles }) {
+export default function CreateProfile() {
+  const { profiles } = useProfile();
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,28 +27,27 @@ export default function CreateProfile({ hasProfiles }) {
   };
 
   return (
-    <div style={{ maxWidth:440, margin:"0 auto" }}>
-      {hasProfiles && <BackButton onBack={() => navigate("/profiles")} label="Back to profiles" />}
+    <div className={styles.formContainer}>
+      {profiles.length > 0 && <BackButton onBack={() => navigate("/profiles")} label="Back to profiles" />}
       <PageHeader title={<>Create Your <em>Profile</em></>} />
-      <div style={{ background:c.card, border:`1px solid ${c.border}`, borderRadius:16, padding:"2rem" }}>
-        <p style={{ margin:"0 0 20px", fontSize:14, color:c.textSoft, fontFamily:"sans-serif", lineHeight:1.7, textAlign:"center" }}>
+      <FormCard>
+        <p className={styles.formTextCenter}>
           Enter your name to create a profile. Your skincare ritual will be saved and accessible anytime.
         </p>
-        <label style={{ fontSize:12, fontWeight:600, color:c.textSoft, fontFamily:"sans-serif", letterSpacing:"0.06em", textTransform:"uppercase", display:"block", marginBottom:8 }}>Your name</label>
-        <input
+        <FormLabel>Your name</FormLabel>
+        <Input
           value={name}
           onChange={e => { setName(e.target.value); setError(""); }}
           onKeyDown={e => e.key === "Enter" && handleCreate()}
           placeholder="e.g. Sarah"
           autoFocus
-          style={{ width:"100%", padding:"11px 14px", borderRadius:10, border:`1px solid ${error ? c.dangerBorder : c.border}`, fontSize:15, fontFamily:"sans-serif", background:c.bg, color:c.text, outline:"none", boxSizing:"border-box", marginBottom: error ? 8 : 20 }}
+          className={error ? styles.formInputError : ""}
         />
-        {error && <div style={{ fontSize:12, color:c.dangerText, fontFamily:"sans-serif", marginBottom:16 }}>{error}</div>}
-        <button onClick={handleCreate} disabled={loading}
-          style={{ width:"100%", padding:"13px", borderRadius:10, border:"none", background:c.accent, color:"#fff", fontSize:15, fontFamily:"'Georgia',serif", cursor:"pointer", letterSpacing:"0.02em" }}>
+        {error && <div className={styles.formInputErrorMsg}>{error}</div>}
+        <PrimaryButton onClick={handleCreate} disabled={loading}>
           {loading ? "Creating..." : "Create Profile →"}
-        </button>
-      </div>
+        </PrimaryButton>
+      </FormCard>
     </div>
   );
 }

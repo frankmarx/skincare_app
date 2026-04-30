@@ -1,111 +1,77 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteProfile, getProfiles } from "../api.js";
-import { PageHeader, SignOutButton } from "../components/Common.jsx";
+import { PageHeader, AccountMenu } from "../components/Common.jsx";
 import { useProfile } from "../context/ProfileContext.jsx";
-import styles from "./Profiles.module.css";
+import profilesStyles from "./Profiles.module.css";
+import layoutStyles from "./Layout.module.css";
 
-function ProfileCard({ profile, onOpen, onDelete }) {
+function ProfileCard({ profile, onOpen }) {
   return (
-    <div
-      onClick={() => onOpen(profile)}
-      className={styles.profileItem}
-    >
-      <div className={styles.avatar}>
-        {profile.name[0]}
-      </div>
-      <div className={styles.info}>
-        <div className={styles.name}>{profile.name}</div>
-        <div className={styles.date}>
-          {profile.updatedAt
-            ? `Last updated ${new Date(profile.updatedAt).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}`
-            : `Created ${new Date(profile.createdAt).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}`}
+    <div onClick={() => onOpen(profile)} className={profilesStyles.card}>
+      <div className={profilesStyles.avatar}>{profile.name[0]}</div>
+      <div className={profilesStyles.name}>{profile.name}</div>
+      <div className={profilesStyles.stats}>
+        <div className={profilesStyles.statItem}>
+          <span>Rituals</span>
+          <span className={profilesStyles.statValue}>{profile.ritualsCount || 0}</span>
+        </div>
+        <div className={profilesStyles.statItem}>
+          <span>Products</span>
+          <span className={profilesStyles.statValue}>{profile.productsCount || 0}</span>
         </div>
       </div>
-      <span className={styles.openArrow}>Open →</span>
-      <button
-        onClick={e => { e.stopPropagation(); onDelete(profile.id); }}
-        className={styles.deleteBtn}
-        title="Delete profile"
-      >×</button>
     </div>
   );
 }
 
-function CreateProfileButton({ onClick }) {
+function AddProfileCard({ onClick }) {
   return (
-    <button onClick={onClick} className={styles.createBtn}>
-      + Create New Profile
-    </button>
+    <div onClick={onClick} className={profilesStyles.addCard}>
+      <div className={profilesStyles.addIcon}>+</div>
+    </div>
   );
 }
 
 export default function Profiles() {
-  const [profiles, setProfiles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { profiles, loadProfiles, loading, selectProfile } = useProfile();
   const navigate = useNavigate();
-  const { selectProfile } = useProfile();
-
-  const loadProfiles = async () => {
-    try {
-      const data = await getProfiles();
-      setProfiles(data.profiles || []);
-    } catch (e) {
-      console.error("Failed to load profiles:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     loadProfiles();
-  }, []);
+  }, [loadProfiles]);
 
   const handleOpen = profile => {
     selectProfile(profile.id);
     navigate("/rituals");
   };
 
-  const handleDelete = async id => {
-    try {
-      await deleteProfile(id);
-      await loadProfiles();
-    } catch (e) {
-      console.error("Failed to delete profile:", e);
-    }
-  };
-
-  if (loading) {
+  if (loading && profiles.length === 0) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner} />
+      <div className={profilesStyles.loadingContainer}>
+        <div className={profilesStyles.spinner} />
       </div>
     );
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
+    <div className={layoutStyles.container}>
+      <div className={layoutStyles.header}>
         <PageHeader title={<>Your <em>Profiles</em></>} />
-        <SignOutButton />
+        <AccountMenu />
       </div>
-      <div className={styles.profilesList}>
+      <div className={profilesStyles.grid}>
         {profiles && profiles.length > 0 ? (
           profiles.map(profile => (
             <ProfileCard 
               key={profile.id} 
               profile={profile} 
               onOpen={handleOpen} 
-              onDelete={handleDelete} 
             />
           ))
-        ) : (
-          <div className={styles.emptyState}>
-            No profiles found. Create one to get started!
-          </div>
-        )}
+        ) : null}
+        <AddProfileCard onClick={() => navigate("/create-profile")} />
       </div>
-      <CreateProfileButton onClick={() => navigate("/create-profile")} />
     </div>
   );
 }

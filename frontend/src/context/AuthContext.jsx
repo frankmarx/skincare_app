@@ -1,21 +1,32 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { loadStoredTokens, signOut } from "../api.js";
+import { loadStoredTokens, signOut, getUser } from "../api.js";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (loadStoredTokens()) {
-      setIsAuthenticated(true);
+    async function initAuth() {
+      if (loadStoredTokens()) {
+        setIsAuthenticated(true);
+        try {
+          const userData = await getUser();
+          setUser(userData);
+        } catch (e) {
+          console.error("Failed to load user data", e);
+        }
+      }
+      setLoading(false);
     }
-    setLoading(false);
+    initAuth();
   }, []);
 
-  const login = () => {
+  const login = async (userData) => {
     setIsAuthenticated(true);
+    setUser(userData);
   };
 
   const logout = async () => {
@@ -25,10 +36,11 @@ export function AuthProvider({ children }) {
       console.error("Sign out failed", e);
     }
     setIsAuthenticated(false);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

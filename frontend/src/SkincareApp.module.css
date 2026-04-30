@@ -1,0 +1,17 @@
+.appWrapper {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: #FDF8F5;
+  min-height: 100vh;
+  padding: env(safe-area-inset-top, 0) 0 0;
+  box-sizing: border-box;
+}
+
+.content {
+  padding: 2rem 1rem;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  padding-top: 4rem;
+}

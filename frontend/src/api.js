@@ -77,6 +77,13 @@ export async function signOut() {
   clearTokens();
 }
 
+export async function getUser() {
+  const response = await fetch(`${API_URL}/auth/me`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(response);
+}
+
 export async function getProfiles() {
   const response = await fetch(`${API_URL}/profiles`, {
     headers: authHeaders(),
@@ -115,6 +122,15 @@ export async function analyzeRoutine(products) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ products }),
+  });
+  return handleResponse(response);
+}
+
+export async function getRituals() {
+  const url = new URL(`${API_URL}/rituals`);
+  // We could add profileId query param here if we pass it
+  const response = await fetch(url, {
+    headers: authHeaders(),
   });
   return handleResponse(response);
 }

@@ -18,6 +18,12 @@ def get_user_id_from_token(token):
     except JWTError:
         raise UnauthorizedError('Invalid token')
 
+def get_user_info(token):
+    try:
+        return jwt.get_unverified_claims(token)
+    except JWTError:
+        raise UnauthorizedError('Invalid token')
+
 def sign_up(email, password):
     print(f"DEBUG: Attempting sign_up for {email} with ClientId={COGNITO_CLIENT_ID}")
     try:
