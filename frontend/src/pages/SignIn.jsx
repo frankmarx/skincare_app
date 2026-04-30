@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signIn } from "../api.js";
+import { useAuth } from "../context/AuthContext.jsx";
 import { c, PageHeader } from "../components/Common.jsx";
 
 export default function SignIn() {
@@ -9,6 +10,7 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async () => {
     if (!email || !password) { setError("Please fill in all fields"); return; }
@@ -16,6 +18,7 @@ export default function SignIn() {
     setLoading(true);
     try {
       await signIn(email, password);
+      login();
       navigate("/profiles");
     } catch (e) {
       const errorType = e.error || "";

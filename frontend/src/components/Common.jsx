@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { getProductSuggestions } from "../api.js";
+import { useNavigate } from "react-router-dom";
+import { getProductSuggestions, signOut } from "../api.js";
+import { useAuth } from "../context/AuthContext.jsx";
+import styles from "./Common.module.css";
 
 export const c = {
   bg:"#FDF8F5", card:"#FFFFFF", accent:"#C9806A", accentLight:"#F5E6DF",
@@ -11,7 +14,23 @@ export const c = {
   danger:"#FCEBEB", dangerBorder:"#F09595", dangerText:"#A32D2D",
 };
 
+export function SignOutButton() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const handleSignOut = async () => {
+    await logout();
+    navigate("/signin");
+  };
+
+  return (
+    <button onClick={handleSignOut} className={styles.signOutBtn}>
+      Sign Out
+    </button>
+  );
+}
+
 export function useDebounce(value, delay) {
+// ... (rest of the file remains the same)
   const [d, setD] = useState(value);
   useEffect(() => {
     const t = setTimeout(() => setD(value), delay);
@@ -194,7 +213,7 @@ export function BackButton({ onBack, label }) {
 
 export function PageHeader({ eyebrow, title }) {
   return (
-    <div style={{ textAlign:"center", marginBottom:"2rem" }}>
+    <div style={{ textAlign:"center", marginBottom:"2rem", marginTop:"2rem" }}>
       <div style={{ fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:c.accent, fontFamily:"sans-serif", marginBottom:6 }}>
         {eyebrow || "Skincare Intelligence"}
       </div>

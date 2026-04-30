@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { analyzeRoutine, saveRitual, getProfiles } from "../api.js";
 import { c, PageHeader, BackButton, ProductAutocomplete, RitualView } from "../components/Common.jsx";
+import { useProfile } from "../context/ProfileContext.jsx";
 
 export default function Builder() {
-  const { profileId } = useParams();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState(null);
+  const { selectedProfile, loading: profileLoading } = useProfile();
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({ name:"", type:"Cleanser" });
   const [analyzing, setAnalyzing] = useState(false);
@@ -21,12 +21,10 @@ export default function Builder() {
   ];
 
   useEffect(() => {
-    getProfiles().then(data => {
-      const p = data.profiles?.find(x => x.id === profileId);
-      if (p) setProfile(p);
-      else navigate("/profiles");
-    });
-  }, [profileId, navigate]);
+    if (!selectedProfile && !profileLoading) {
+      navigate("/profiles");
+    }
+  }, [selectedProfile, profileLoading, navigate]);
 
   const addProduct = () => {
     if (!newProduct.name.trim()) return;
@@ -47,25 +45,25 @@ export default function Builder() {
   };
 
   const saveRitualHandler = async () => {
-    if (!pendingResult) return;
+    if (!pendingResult || !selectedProfile) return;
     setSaving(true);
     try {
-      await saveRitual(profileId, products, pendingResult);
-      navigate(`/ritual/${profileId}`);
+      await saveRitual(selectedProfile.id, products, pendingResult);
+      navigate("/rituals");
     } catch (e) {
       setError(e.message || "Failed to save ritual");
       setSaving(false);
     }
   };
 
-  if (!profile) return null;
+  if (profileLoading || !selectedProfile) return null;
 
   return (
     <div style={{ maxWidth:720, margin:"0 auto" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
-        <BackButton onBack={() => navigate("/profiles")} label="Back to profiles" />
+        <BackButton onBack={() => navigate("/rituals")} label="Back to rituals" />
       </div>
-      <PageHeader eyebrow={profile.name} title={<>Build Your <em>Ritual</em></>} />
+      <PageHeader eyebrow={selectedProfile.name} title={<>Build Your <em>Ritual</em></>} />
 
       {pendingResult ? (
         <>
