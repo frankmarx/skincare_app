@@ -4,12 +4,21 @@ frontend/dist/
 frontend/.env*
 frontend/.env.local
 
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env*
+frontend/.env.local
+
 # Python / Backend
-backend/__pycache__/
-backend/*.pyc
+**/__pycache__/
+**/*.pyc
 backend/skincare-env/
 backend/.env
 backend/.chalice/deployments/
+
+# General
+.DS_Store
 
 # General
 .DS_Store
