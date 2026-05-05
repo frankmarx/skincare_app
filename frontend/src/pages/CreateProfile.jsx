@@ -20,7 +20,7 @@ export default function CreateProfile() {
     setError("");
     try {
       const profile = await createProfile(n, description);
-      navigate(`/builder/${profile.id}`);
+      navigate("/profiles");
     } catch (e) {
       setError(e.message || "Failed to create profile");
     }

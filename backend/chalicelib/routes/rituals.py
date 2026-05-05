@@ -2,17 +2,11 @@ import uuid
 from chalice import Blueprint, UnauthorizedError
 from chalicelib.claude import suggest_products, analyze_routine
 from chalicelib.db import get_db
-from chalicelib.models import Ritual, Profile, Product
+from chalicelib.models import Ritual, Profile, Product, RitualProduct
+from chalicelib.auth import require_auth
 from datetime import datetime
 
 rituals = Blueprint(__name__)
-
-def require_auth():
-    from chalicelib.auth import get_user_id_from_token
-    token = rituals.current_request.headers.get('Authorization', '').replace('Bearer ', '')
-    if not token:
-        raise UnauthorizedError('Missing authorization token')
-    return get_user_id_from_token(token)
 
 @rituals.route('/rituals/suggest', methods=['POST'])
 def get_product_suggestions():
@@ -45,7 +39,7 @@ def analyze():
 @rituals.route('/rituals', methods=['GET'])
 def list_rituals():
     try:
-        user_id = require_auth()
+        user_id = require_auth(rituals.current_request)
         profile_filter = rituals.current_request.query_params.get('profileId')
         
         with get_db() as db:
@@ -66,7 +60,7 @@ def list_rituals():
                 # Get profile for the avatar/name
                 profile = db.query(Profile).filter_by(id=r.profile_id).first()
                 # Get products for this ritual
-                products = db.query(Product).filter_by(ritual_id=r.id).all()
+                products = [rp.product for rp in r.ritual_products]
                 
                 results.append({
                     'id': r.id,
@@ -86,7 +80,7 @@ def list_rituals():
 @rituals.route('/rituals/{profile_id}', methods=['GET'])
 def get_ritual(profile_id):
     try:
-        user_id = require_auth()
+        user_id = require_auth(rituals.current_request)
         
         with get_db() as db:
             profile = db.query(Profile).filter_by(id=profile_id, user_id=user_id).first()
@@ -99,7 +93,7 @@ def get_ritual(profile_id):
             if not ritual:
                 return {'ritual': None}
             
-            products = db.query(Product).filter_by(ritual_id=ritual.id).all()
+            products = [rp.product for rp in ritual.ritual_products]
             
             return {
                 'ritual': {
@@ -115,7 +109,7 @@ def get_ritual(profile_id):
 @rituals.route('/rituals', methods=['POST'])
 def save_ritual():
     try:
-        user_id = require_auth()
+        user_id = require_auth(rituals.current_request)
         body = rituals.current_request.json_body
         
         profile_id = body.get('profileId')
@@ -141,12 +135,21 @@ def save_ritual():
             db.add(ritual)
             
             for p in products:
-                product = Product(
+                name = p.get('name', '')
+                product_type = p.get('type', 'Other')
+                
+                # Try to find existing product
+                product = db.query(Product).filter_by(name=name, product_type=product_type).first()
+                if not product:
+                    product = Product(name=name, product_type=product_type)
+                    db.add(product)
+                    db.flush()
+                
+                ritual_product = RitualProduct(
                     ritual_id=ritual_id,
-                    name=p.get('name', ''),
-                    product_type=p.get('type', 'Other'),
+                    product_id=product.id
                 )
-                db.add(product)
+                db.add(ritual_product)
             
             db.commit()
             

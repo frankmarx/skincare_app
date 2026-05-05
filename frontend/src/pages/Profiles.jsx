@@ -39,7 +39,7 @@ export default function Profiles() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadProfiles();
+    loadProfiles(true);
   }, [loadProfiles]);
 
   const handleOpen = profile => {

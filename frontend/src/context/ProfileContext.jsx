@@ -9,8 +9,8 @@ export function ProfileProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const profilesCache = useRef([]);
 
-  const loadProfiles = useCallback(async () => {
-    if (profilesCache.current.length > 0) {
+  const loadProfiles = useCallback(async (force = false) => {
+    if (!force && profilesCache.current.length > 0) {
       setProfiles(profilesCache.current);
       return profilesCache.current;
     }

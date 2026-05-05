@@ -2,7 +2,8 @@ from chalice import Chalice, CORSConfig
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+# Load .env from the backend directory and override existing environment variables
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'), override=True)
 
 app = Chalice(app_name='skincare-api')
 # 1. Define your configuration once

@@ -2,14 +2,10 @@ import uuid
 from datetime import datetime
 from chalice import Blueprint, UnauthorizedError
 from chalicelib.db import get_db
-from chalicelib.models import Profile, Ritual, Product
+from chalicelib.models import Profile, Ritual, Product, RitualProduct
+from chalicelib.auth import require_auth
 
 profiles = Blueprint(__name__)
-
-def require_auth(request):
-    from chalicelib.auth import get_user_id_from_token
-    token = request.headers.get('Authorization', '').replace('Bearer ', '')
-    return get_user_id_from_token(token)
 
 @profiles.route('/profiles', methods=['GET'])
 def list_profiles():
@@ -24,7 +20,7 @@ def list_profiles():
             for p in profiles_list:
                 try:
                     ritual_count = db.query(Ritual).filter_by(profile_id=p.id).count()
-                    product_count = db.query(Product).join(Ritual).filter(Ritual.profile_id == p.id).count()
+                    product_count = db.query(RitualProduct).join(Ritual).filter(Ritual.profile_id == p.id).count()
                 except Exception as e:
                     print(f"Error counting for profile {p.id}: {e}")
                     ritual_count = 0

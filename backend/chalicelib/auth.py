@@ -18,6 +18,12 @@ def get_user_id_from_token(token):
     except JWTError:
         raise UnauthorizedError('Invalid token')
 
+def require_auth(request):
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    if not token:
+        raise UnauthorizedError('Missing authorization token')
+    return get_user_id_from_token(token)
+
 def get_user_info(token):
     try:
         return jwt.get_unverified_claims(token)
@@ -68,20 +74,3 @@ def sign_in(email, password):
     except Exception as e:
         print(f"DEBUG: sign_in failed: {str(e)}")
         raise e
-
-def confirm_sign_up(email, code):
-    return cognito_client.confirm_sign_up(
-        ClientId=COGNITO_CLIENT_ID,
-        Username=email,
-        ConfirmationCode=code,
-    )
-
-def sign_in(email, password):
-    return cognito_client.initiate_auth(
-        ClientId=COGNITO_CLIENT_ID,
-        AuthFlow='USER_PASSWORD_AUTH',
-        AuthParameters={
-            'USERNAME': email,
-            'PASSWORD': password,
-        },
-    )
