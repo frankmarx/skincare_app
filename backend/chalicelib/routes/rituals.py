@@ -4,14 +4,16 @@ from chalicelib.claude import suggest_products, analyze_routine
 from chalicelib.db import get_db
 from chalicelib.models import Ritual, Profile, Product, RitualProduct
 from chalicelib.auth import require_auth
+from chalicelib.utils import handle_errors
 from datetime import datetime
 
 rituals = Blueprint(__name__)
 
 @rituals.route('/rituals/suggest', methods=['POST'])
+@handle_errors
 def get_product_suggestions():
     try:
-        body = rituals.current_request.json_body
+        body = rituals.current_request.json_body or {}
         query = body.get('query', '')
         
         if not query:
@@ -23,9 +25,10 @@ def get_product_suggestions():
         return {'error': str(e)}, 500
 
 @rituals.route('/rituals/analyze', methods=['POST'])
+@handle_errors
 def analyze():
     try:
-        body = rituals.current_request.json_body
+        body = rituals.current_request.json_body or {}
         products = body.get('products', [])
         
         if not products:
@@ -37,6 +40,7 @@ def analyze():
         return {'error': str(e)}, 500
 
 @rituals.route('/rituals', methods=['GET'])
+@handle_errors
 def list_rituals():
     try:
         user_id = require_auth(rituals.current_request)
@@ -78,6 +82,7 @@ def list_rituals():
         return {'error': str(e)}, 500
 
 @rituals.route('/rituals/{profile_id}', methods=['GET'])
+@handle_errors
 def get_ritual(profile_id):
     try:
         user_id = require_auth(rituals.current_request)
@@ -107,10 +112,11 @@ def get_ritual(profile_id):
         return {'error': str(e)}, 500
 
 @rituals.route('/rituals', methods=['POST'])
+@handle_errors
 def save_ritual():
     try:
         user_id = require_auth(rituals.current_request)
-        body = rituals.current_request.json_body
+        body = rituals.current_request.json_body or {}
         
         profile_id = body.get('profileId')
         products = body.get('products', [])

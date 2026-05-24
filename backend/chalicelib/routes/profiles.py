@@ -4,10 +4,12 @@ from chalice import Blueprint, UnauthorizedError
 from chalicelib.db import get_db
 from chalicelib.models import Profile, Ritual, Product, RitualProduct
 from chalicelib.auth import require_auth
+from chalicelib.utils import handle_errors
 
 profiles = Blueprint(__name__)
 
 @profiles.route('/profiles', methods=['GET'])
+@handle_errors
 def list_profiles():
     try:
         request = profiles.current_request
@@ -45,6 +47,7 @@ def list_profiles():
         return {'error': str(e)}, 500
 
 @profiles.route('/profiles', methods=['POST'])
+@handle_errors
 def create_profile():
     try:
         request = profiles.current_request
@@ -72,6 +75,7 @@ def create_profile():
         return {'error': str(e)}, 500
 
 @profiles.route('/profiles/{profile_id}', methods=['DELETE'])
+@handle_errors
 def delete_profile(profile_id):
     try:
         request = profiles.current_request
